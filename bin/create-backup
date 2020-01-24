@@ -1,0 +1,11 @@
+#!/bin/sh
+
+host=$1
+
+mkdir -p $host/etc/backup
+
+# NOTE: current snapshot has simiar output as "-k" to sysupgrade
+ssh root@$host opkg list-installed | awk '{print $1}' > $host/etc/backup/installed_packages.txt
+
+ssh root@$host sysupgrade --create-backup - | tar -xvzC $host
+
