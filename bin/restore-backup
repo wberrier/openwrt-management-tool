@@ -1,6 +1,9 @@
 #!/bin/sh
 
-echo "TODO"
+host=$1
 
-# Create a tarball from the files here and restore with sysupgrade
+# Restore the config
+tar -cvzC $host . | ssh root@$host sysupgrade --restore-backup -
 
+# Reboot after setting the config
+ssh root@$host reboot
