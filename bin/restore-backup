@@ -3,7 +3,7 @@
 host=$1
 
 # Restore the config
-tar -cvzC $host . | ssh root@$host sysupgrade --restore-backup -
+tar -cvzC $host --group=0 --owner=0 . | ssh root@$host sysupgrade --restore-backup -
 
 # Reboot after setting the config
 ssh root@$host reboot
