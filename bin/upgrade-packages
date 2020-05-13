@@ -2,4 +2,4 @@
 
 host=$1
 
-ssh root@$host 'opkg update && opkg list-upgradable | awk "{print $1}" | xargs opkg upgrade'
+ssh root@$host 'opkg update && opkg list-upgradable | awk "{print \$1}" | xargs opkg upgrade'
