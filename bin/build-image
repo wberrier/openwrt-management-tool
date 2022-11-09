@@ -1,10 +1,16 @@
 #!/bin/bash
 
+release="21.02.5"
+
 set -x
 
-source "./conf/image-${1}.sh" || { echo "Unable to load configuration for: $1" ;  exit 1 ; }
+install_deps() {
+	sudo dnf install -y git gawk gettext ncurses-devel zlib-devel openssl-devel libxslt wget which @c-development @development-tools @development-libs zlib-static which python3 perl-FindBin
+}
 
-release="21.02.5"
+install_deps
+
+source "./conf/image-${1}.sh" || { echo "Unable to load configuration for: $1" ;  exit 1 ; }
 
 image_builder_url="https://downloads.openwrt.org/releases/$release/targets/$target/$sub_target/openwrt-imagebuilder-$release-$target-$sub_target.Linux-x86_64.tar.xz"
 
@@ -22,7 +28,7 @@ pushd tmp || exit 1
 wget --continue --timestamping "$image_builder_url"
 archive=$(basename "$image_builder_url")
 sdk_dir=$(basename "$image_builder_url" .tar.xz)
-[ -e "$sdk_dir" ] || tar Jxvf "$archive"
+[ -e "$sdk_dir" ] || tar Jxf "$archive"
 
 pushd "$sdk_dir" || exit 1
 
