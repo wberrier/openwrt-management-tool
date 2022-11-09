@@ -1,0 +1,31 @@
+#!/bin/bash
+
+set -x
+
+source "./conf/image-${1}.sh" || { echo "Unable to load configuration for: $1" ;  exit 1 ; }
+
+release="21.02.5"
+
+image_builder_url="https://downloads.openwrt.org/releases/$release/targets/$target/$sub_target/openwrt-imagebuilder-$release-$target-$sub_target.Linux-x86_64.tar.xz"
+
+source ./conf/packages.sh
+
+PACKAGES=${packages[@]}
+
+# Add removals
+for p in ${packages_to_remove[@]} ; do
+	PACKAGES="$PACKAGES -$p"
+done
+
+mkdir -p tmp
+pushd tmp || exit 1
+wget --continue --timestamping "$image_builder_url"
+archive=$(basename "$image_builder_url")
+sdk_dir=$(basename "$image_builder_url" .tar.xz)
+[ -e "$sdk_dir" ] || tar Jxvf "$archive"
+
+pushd "$sdk_dir" || exit 1
+
+make image PROFILE="$PROFILE" PACKAGES="$PACKAGES" EXTRA_IMAGE_NAME="$EXTRA_IMAGE_NAME"
+
+popd || exit 1
