@@ -18,6 +18,8 @@ source ./conf/base.sh
 
 PACKAGES=${packages[@]}
 
+rootfs_dir="$(pwd)/$1"
+
 # Add removals
 for p in ${packages_to_remove[@]} ; do
 	PACKAGES="$PACKAGES -$p"
@@ -32,6 +34,6 @@ sdk_dir=$(basename "$image_builder_url" .tar.xz)
 
 pushd "$sdk_dir" || exit 1
 
-make image PROFILE="$PROFILE" PACKAGES="$PACKAGES" EXTRA_IMAGE_NAME="$EXTRA_IMAGE_NAME" DISABLED_SERVICES="$DISABLED_SERVICES"
+make image PROFILE="$PROFILE" PACKAGES="$PACKAGES" EXTRA_IMAGE_NAME="$EXTRA_IMAGE_NAME" DISABLED_SERVICES="$DISABLED_SERVICES" FILES="$rootfs_dir"
 
 popd || exit 1
