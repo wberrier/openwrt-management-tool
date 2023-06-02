@@ -1,6 +1,6 @@
 #!/bin/bash -x
 
-#release="21.02.7"
+#release="snapshot"
 release="22.03.5"
 
 set -x
@@ -13,7 +13,12 @@ install_deps
 
 source "./conf/image-${1}.sh" || { echo "Unable to load configuration for: $1" ;  exit 1 ; }
 
-image_builder_url="https://downloads.openwrt.org/releases/$release/targets/$target/$sub_target/openwrt-imagebuilder-$release-$target-$sub_target.Linux-x86_64.tar.xz"
+if [ "$release" = "snapshot" ] ; then
+	image_builder_url="https://downloads.openwrt.org/snapshots/targets/$target/$sub_target/openwrt-imagebuilder-$target-$sub_target.Linux-x86_64.tar.xz"
+else
+	image_builder_url="https://downloads.openwrt.org/releases/$release/targets/$target/$sub_target/openwrt-imagebuilder-$release-$target-$sub_target.Linux-x86_64.tar.xz"
+fi
+
 
 source ./conf/base.sh
 
