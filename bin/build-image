@@ -11,6 +11,8 @@ install_deps() {
 
 install_deps
 
+source ./conf/base.sh
+
 source "./conf/image-${1}.sh" || { echo "Unable to load configuration for: $1" ;  exit 1 ; }
 
 if [ "$release" = "snapshot" ] ; then
@@ -19,8 +21,6 @@ else
 	image_builder_url="https://downloads.openwrt.org/releases/$release/targets/$target/$sub_target/openwrt-imagebuilder-$release-$target-$sub_target.Linux-x86_64.tar.xz"
 fi
 
-
-source ./conf/base.sh
 
 PACKAGES=${packages[@]}
 
