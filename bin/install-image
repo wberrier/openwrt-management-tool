@@ -1,0 +1,32 @@
+#!/bin/bash
+
+set -x
+
+host="$1"
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+source $SCRIPT_DIR/lib/omt-common.sh
+
+source ./conf/base.sh
+
+source "./conf/image-${host}.sh" || { echo "Unable to load configuration for: $1" ;  exit 1 ; }
+
+# sysupgrade the built image
+
+sdk_dir=$(build_sdk_dir)
+
+pushd tmp || exit 1
+pushd "$sdk_dir" || exit 1
+
+image_file="$(build_image_file_path)"
+
+[ -e "$image_file" ] || { echo "Image not found: $image_file" ; exit 1 ; }
+
+cat "$image_file" | ssh root@$host "cat > /tmp/image.bin"
+local_hash=$(sha256sum "$image_file" | awk '{print $1}')
+
+ssh "root@$host" "[[ \$(sha256sum /tmp/image.bin | awk '{print \$1}') = "$local_hash" ]] && sysupgrade -v -n /tmp/image.bin"
+
+popd || exit 1
+popd || exit 1

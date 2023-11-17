@@ -1,8 +1,5 @@
 #!/bin/bash -x
 
-#release="snapshot"
-release="23.05.2"
-
 set -x
 
 install_deps() {
@@ -11,16 +8,15 @@ install_deps() {
 
 install_deps
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+source $SCRIPT_DIR/lib/omt-common.sh
+
 source ./conf/base.sh
 
 source "./conf/image-${1}.sh" || { echo "Unable to load configuration for: $1" ;  exit 1 ; }
 
-if [ "$release" = "snapshot" ] ; then
-	image_builder_url="https://downloads.openwrt.org/snapshots/targets/$target/$sub_target/openwrt-imagebuilder-$target-$sub_target.Linux-x86_64.tar.xz"
-else
-	image_builder_url="https://downloads.openwrt.org/releases/$release/targets/$target/$sub_target/openwrt-imagebuilder-$release-$target-$sub_target.Linux-x86_64.tar.xz"
-fi
-
+image_builder_url=$(build_image_builder_url)
 
 PACKAGES=${packages[@]}
 
@@ -34,8 +30,8 @@ done
 mkdir -p tmp
 pushd tmp || exit 1
 wget --continue --timestamping "$image_builder_url"
-archive=$(basename "$image_builder_url")
-sdk_dir=$(basename "$image_builder_url" .tar.xz)
+archive=$(build_archive_path)
+sdk_dir=$(build_sdk_dir)
 [ -e "$sdk_dir" ] || tar Jxf "$archive"
 
 pushd "$sdk_dir" || exit 1
@@ -46,4 +42,5 @@ make_opts=(
 
 make image PROFILE="$PROFILE" PACKAGES="$PACKAGES" EXTRA_IMAGE_NAME="$EXTRA_IMAGE_NAME" DISABLED_SERVICES="$DISABLED_SERVICES" "${make_opts[@]}"
 
+popd || exit 1
 popd || exit 1
