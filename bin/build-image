@@ -1,14 +1,25 @@
-#!/bin/bash -x
+#!/bin/bash
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+source $SCRIPT_DIR/lib/os-common.sh
 
 set -x
 
 install_deps() {
-	sudo dnf install -y git gawk gettext ncurses-devel zlib-devel openssl-devel libxslt wget which @c-development @development-tools @development-libs zlib-static which python3 perl-FindBin
+	# From: https://openwrt.org/docs/guide-user/additional-software/imagebuilder
+	case $(package_system) in
+	rpm)
+		install_packages git gawk gettext ncurses-devel zlib-devel openssl-devel libxslt wget which @c-development @development-tools @development-libs zlib-static which python3 perl-FindBin
+		;;
+	dpkg)
+		# old: libncursesw-dev
+		install_packages build-essential libncurses-dev zlib1g-dev gawk git gettext libssl-dev xsltproc rsync wget unzip python3
+		;;
+	esac
 }
 
 install_deps
-
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 source $SCRIPT_DIR/lib/omt-common.sh
 
