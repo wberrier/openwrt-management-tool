@@ -43,7 +43,7 @@ pushd tmp || exit 1
 wget --continue --timestamping "$image_builder_url"
 archive=$(build_archive_path)
 sdk_dir=$(build_sdk_dir)
-[ -e "$sdk_dir" ] || tar Jxf "$archive"
+[ -e "$sdk_dir" ] || tar axf "$archive"
 
 pushd "$sdk_dir" || exit 1
 
