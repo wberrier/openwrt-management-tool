@@ -6,8 +6,10 @@ SYSUPGRADE_EXTENSION=".bin"
 sdk_extension() {
 	if [ "$RELEASE" = "snapshot" ] ; then
 		echo ".tar.zst"
-	else
+	elif version_less_than "$RELEASE" "24.10.0" ; then
 		echo ".tar.xz"
+	else
+		echo ".tar.zst"
 	fi
 }
 
