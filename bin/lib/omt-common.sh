@@ -32,7 +32,7 @@ build_sdk_dir() {
 }
 
 build_archive_path() {
-	basename "$image_builder_url"
+	basename "$(build_image_builder_url)"
 }
 
 build_image_file_path() {
