@@ -73,12 +73,13 @@ impl Config {
     }
 }
 
-pub fn get_config(name: String) -> Result<Config> {
+pub fn get_config(name: &String) -> Result<Config> {
     let yaml_base_config =
         std::fs::read_to_string(Path::new(CONFIG_DIR).join(BASE_CONFIG_FILE_NAME))?;
     let base_config: BaseConfig = serde_yaml::from_str(&yaml_base_config)?;
 
-    let yaml_image_config = std::fs::read_to_string(Path::new(CONFIG_DIR).join(name + ".yml"))?;
+    let yaml_image_config =
+        std::fs::read_to_string(Path::new(CONFIG_DIR).join(name.clone() + ".yml"))?;
     let image_config: ImageConfig = serde_yaml::from_str(&yaml_image_config)?;
 
     let mut config = Config::new();
@@ -121,7 +122,9 @@ pub fn get_config(name: String) -> Result<Config> {
             config.package_removals.extend(base_config.package_removals);
         }
         if includes.disabled_services {
-            config.disabled_services.extend(base_config.disabled_services);
+            config
+                .disabled_services
+                .extend(base_config.disabled_services);
         }
     }
 
