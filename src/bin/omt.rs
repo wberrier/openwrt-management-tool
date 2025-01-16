@@ -2,6 +2,7 @@ use anyhow::Result;
 use structopt::StructOpt;
 
 use openwrt_management_tool::commands::build_image::build_image;
+use openwrt_management_tool::commands::create_backup::create_backup;
 use openwrt_management_tool::commands::install_build_requirements::install_build_requirements;
 
 #[derive(Debug, StructOpt)]
@@ -14,7 +15,7 @@ enum OMTCommands {
     #[structopt(about = "install firmware image")]
     InstallImage {},
     #[structopt(about = "create backup configuration")]
-    CreateBackup {},
+    CreateBackup { name: String },
     #[structopt(about = "restore backup configuration")]
     RestoreBackup {},
     #[structopt(about = "install packages")]
@@ -29,6 +30,7 @@ fn main() -> Result<()> {
     match subcommand_options {
         OMTCommands::InstallBuildRequirements {} => install_build_requirements(),
         OMTCommands::BuildImage { name } => build_image(name),
+        OMTCommands::CreateBackup { name } => create_backup(name),
         _ => Ok(()),
     }
 }

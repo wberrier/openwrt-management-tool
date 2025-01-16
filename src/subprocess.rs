@@ -17,3 +17,8 @@ pub fn getstatus(exec: &str, args: Vec<String>) -> Result<i32> {
         .ok_or(anyhow!("Unable to get exit code"))?;
     Ok(code)
 }
+
+// Wrap in a shell invocation
+pub fn getstatus_shell(command: String) -> Result<i32> {
+    getstatus("/bin/sh".into(), vec!["-c".into(), command])
+}
