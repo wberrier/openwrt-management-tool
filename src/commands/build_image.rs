@@ -62,17 +62,21 @@ pub fn build_image(name: String) -> Result<()> {
 
     let disabled_services_str = config.disabled_services.join(" ");
 
-    let code = getstatus(
-        "make",
-        [
-            "image".to_string(),
-            format!("PROFILE={}", &config.profile),
-            format!("PACKAGES={}", packages_str),
-            format!("EXTRA_IMAGE_NAME={}", &config.extra_image_name),
-            format!("DISABLED={}", disabled_services_str),
-            format!("FILES={}", rootfs_dir),
-        ],
-    )?;
+    let mut make_args = vec![
+        "image".to_string(),
+        format!("PROFILE={}", &config.profile),
+        format!("PACKAGES={}", packages_str),
+        format!("EXTRA_IMAGE_NAME={}", &config.extra_image_name),
+        format!("DISABLED={}", disabled_services_str),
+    ];
+
+    if !config.skip_files {
+        make_args.push(format!("FILES={}", rootfs_dir));
+    } else {
+        println!("NOTE: skipping files");
+    }
+
+    let code = getstatus("make", make_args)?;
 
     // Go back to original directory
     std::env::set_current_dir(current_dir.as_path())?;
