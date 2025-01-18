@@ -1,5 +1,0 @@
-#!/bin/sh
-
-host=$1
-
-ssh root@$host 'opkg update && packages=$(opkg list-upgradable | awk "{print \$1}") && if [ "$packages" != "" ] ; then opkg upgrade $packages ; else echo "No packages to upgrade" ; fi'

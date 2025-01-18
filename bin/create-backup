@@ -1,8 +1,0 @@
-#!/bin/sh
-
-host=$1
-
-mkdir -p $host/etc/backup
-
-ssh root@$host sysupgrade -k --create-backup - | tar -xvzC $host
-
