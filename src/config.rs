@@ -79,7 +79,7 @@ pub fn get_config(name: &String) -> Result<Config> {
     let base_config: BaseConfig = serde_yaml::from_str(&yaml_base_config)?;
 
     let yaml_image_config =
-        std::fs::read_to_string(Path::new(CONFIG_DIR).join(name.clone() + ".yml"))?;
+        std::fs::read_to_string(Path::new(CONFIG_DIR).join(format!("image-{}.yml", name)))?;
     let image_config: ImageConfig = serde_yaml::from_str(&yaml_image_config)?;
 
     let mut config = Config::new();
