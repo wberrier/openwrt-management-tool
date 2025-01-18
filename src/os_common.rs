@@ -1,5 +1,6 @@
 use anyhow::{anyhow, bail, Result};
 use os_info::Type::*;
+use shleazy::run_shell_or_err;
 
 pub enum PackageSystem {
     DNF,
@@ -25,11 +26,5 @@ pub fn install_packages(packages: &str) -> Result<()> {
         Err(error) => bail!(error),
     };
 
-    let (code, output, _error) =
-        run_script::run_script!(format!("{} {}", install_command, packages))?;
-    if code == 0 {
-        return Ok(());
-    } else {
-        bail!("Error installing packages: {}", output);
-    }
+    run_shell_or_err(format!("{} {}", install_command, packages))
 }

@@ -4,27 +4,17 @@ use std::path::{Path, PathBuf};
 
 use super::super::config::{get_config, Config};
 use super::super::openwrt_vars::{archive_path, image_builder_url, sdk_dir};
-use super::super::subprocess::getstatus;
+use shleazy::{getstatus, run_shell_or_err};
 
 fn fetch_image_builder(config: &Config) -> Result<()> {
     // TODO: could use native rust, but it would need to decode, support partial downloads, etc...
     let image_builder_url = image_builder_url(&config)?;
     println!("Fetching image builder: {}", image_builder_url);
 
-    let code = getstatus(
-        "wget",
-        vec![
-            "--continue".into(),
-            "--timestamping".into(),
-            image_builder_url,
-        ],
-    )?;
-
-    if code != 0 {
-        bail!("Unable to download image builder");
-    }
-
-    Ok(())
+    run_shell_or_err(&format!(
+        "wget --continue --timestamping {}",
+        image_builder_url
+    ))
 }
 
 fn extract_image_builder(config: &Config) -> Result<()> {
@@ -32,10 +22,7 @@ fn extract_image_builder(config: &Config) -> Result<()> {
     let archive_path = archive_path(&config)?;
 
     if !Path::new(&sdk_dir).exists() {
-        let code = getstatus("tar", vec!["axf".into(), archive_path])?;
-        if code != 0 {
-            bail!("Unable to extract image builder");
-        }
+        run_shell_or_err(&format!("tar axf {}", archive_path))?;
     } else {
         println!("sdk already extracted");
     }
@@ -77,8 +64,8 @@ pub fn build_image(name: String) -> Result<()> {
 
     let code = getstatus(
         "make",
-        vec![
-            "image".into(),
+        [
+            "image".to_string(),
             format!("PROFILE={}", &config.profile),
             format!("PACKAGES={}", packages_str),
             format!("EXTRA_IMAGE_NAME={}", &config.extra_image_name),

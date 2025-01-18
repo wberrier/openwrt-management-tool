@@ -1,16 +1,10 @@
-use anyhow::{bail, Result};
+use anyhow::Result;
 
-use super::super::subprocess::getstatus_shell;
+use shleazy::run_shell_or_err;
 
 pub fn create_backup(name: String) -> Result<()> {
-    let code = getstatus_shell(format!(
+    run_shell_or_err(&format!(
         "ssh root@{} sysupgrade -k --create-backup - | tar -xvzC {}",
         name, name
-    ))?;
-
-    if code != 0 {
-        bail!("Error creating backup");
-    }
-
-    Ok(())
+    ))
 }

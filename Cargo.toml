@@ -2,7 +2,7 @@
 name = "openwrt-management-tool"
 version = "0.1.0"
 authors = ["Wade Berrier <wberrier@gmail.com>"]
-edition = "2018"
+edition = "2021"
 license = "GPL"
 description = "Tool to help automate openwrt management"
 
@@ -11,8 +11,8 @@ description = "Tool to help automate openwrt management"
 [dependencies]
 structopt = "0.3"
 serde = { version = "1.0", features = ["derive"] }
-serde_yaml = "0.8"
+serde_yaml = "0.9"
 anyhow = "1.0"
 os_info = "3"
-run_script = "0"
 version-compare = "0"
+shleazy = "0"
