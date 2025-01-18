@@ -11,10 +11,11 @@ pub fn sdk_extension(config: &Config) -> Result<String> {
     let release = Version::from(release_str.as_str()).ok_or(anyhow!("invalid version"))?;
 
     // Versions older than this used .tar.xz
-    let zst_version = Version::from("24.10.0").ok_or(anyhow!("invalid version"))?;
+    let zst_version = Version::from("24").ok_or(anyhow!("invalid version"))?;
 
     let mut extension = ".tar.zst".to_string();
 
+    // Snapshot is .zst ...
     if release_str != "snapshot" && release < zst_version {
         extension = ".tar.xz".to_string();
     }
