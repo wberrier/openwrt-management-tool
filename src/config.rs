@@ -17,10 +17,10 @@ pub struct BaseConfig {
 
 #[derive(Deserialize, Debug)]
 pub struct BaseIncludes {
-    pub packages: bool,
-    pub extra_packages: bool,
-    pub package_removals: bool,
-    pub disabled_services: bool,
+    pub packages: Option<bool>,
+    pub extra_packages: Option<bool>,
+    pub package_removals: Option<bool>,
+    pub disabled_services: Option<bool>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -112,19 +112,27 @@ pub fn get_config(name: &String) -> Result<Config> {
     }
 
     if let Some(includes) = image_config.includes {
-        if includes.packages {
-            config.packages.extend(base_config.packages);
+        if let Some(packages) = includes.packages {
+            if packages {
+                config.packages.extend(base_config.packages);
+            }
         }
-        if includes.extra_packages {
-            config.packages.extend(base_config.extra_packages);
+        if let Some(extra_packages) = includes.extra_packages {
+            if extra_packages {
+                config.packages.extend(base_config.extra_packages);
+            }
         }
-        if includes.package_removals {
-            config.package_removals.extend(base_config.package_removals);
+        if let Some(package_removals) = includes.package_removals {
+            if package_removals {
+                config.package_removals.extend(base_config.package_removals);
+            }
         }
-        if includes.disabled_services {
-            config
-                .disabled_services
-                .extend(base_config.disabled_services);
+        if let Some(disabled_services) = includes.disabled_services {
+            if disabled_services {
+                config
+                    .disabled_services
+                    .extend(base_config.disabled_services);
+            }
         }
     }
 
