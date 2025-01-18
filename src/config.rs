@@ -1,6 +1,5 @@
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use serde::Deserialize;
-use std::path::Path;
 
 const CONFIG_DIR: &str = "conf";
 const BASE_CONFIG_FILE_NAME: &str = "base.yml";
@@ -73,13 +72,20 @@ impl Config {
     }
 }
 
+// Nicer error message
+fn open_file(filename: &String) -> Result<String> {
+    println!("Reading config file: {}", filename);
+    match std::fs::read_to_string(filename) {
+        Ok(s) => Ok(s),
+        Err(_) => Err(anyhow!("Unable to read file: {}", filename)),
+    }
+}
+
 pub fn get_config(name: &String) -> Result<Config> {
-    let yaml_base_config =
-        std::fs::read_to_string(Path::new(CONFIG_DIR).join(BASE_CONFIG_FILE_NAME))?;
+    let yaml_base_config = open_file(&format!("{}/{}", CONFIG_DIR, BASE_CONFIG_FILE_NAME))?;
     let base_config: BaseConfig = serde_yaml::from_str(&yaml_base_config)?;
 
-    let yaml_image_config =
-        std::fs::read_to_string(Path::new(CONFIG_DIR).join(format!("image-{}.yml", name)))?;
+    let yaml_image_config = open_file(&format!("{}/image-{}.yml", CONFIG_DIR, name))?;
     let image_config: ImageConfig = serde_yaml::from_str(&yaml_image_config)?;
 
     let mut config = Config::new();
