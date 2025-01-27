@@ -1,5 +1,5 @@
 use anyhow::Result;
-use structopt::StructOpt;
+use clap::Parser;
 
 use openwrt_management_tool::commands::build_image::build_image;
 use openwrt_management_tool::commands::create_backup::create_backup;
@@ -8,25 +8,25 @@ use openwrt_management_tool::commands::install_image::install_image;
 use openwrt_management_tool::commands::restore_backup::restore_backup;
 use openwrt_management_tool::commands::upgrade_packages::upgrade_packages;
 
-#[derive(Debug, StructOpt)]
-#[structopt(about, author)]
+#[derive(Debug, Parser)]
+#[clap(about, author)]
 enum OMTCommands {
-    #[structopt(about = "install build requirements")]
+    #[clap(about = "install build requirements")]
     InstallBuildRequirements {},
-    #[structopt(about = "build firmware image")]
+    #[clap(about = "build firmware image")]
     BuildImage { name: String },
-    #[structopt(about = "install firmware image")]
+    #[clap(about = "install firmware image")]
     InstallImage { name: String },
-    #[structopt(about = "create backup configuration")]
+    #[clap(about = "create backup configuration")]
     CreateBackup { name: String },
-    #[structopt(about = "restore backup configuration")]
+    #[clap(about = "restore backup configuration")]
     RestoreBackup { name: String },
-    #[structopt(about = "upgrade packages")]
+    #[clap(about = "upgrade packages")]
     UpgradePackages { name: String },
 }
 
 fn main() -> Result<()> {
-    let subcommand_options = OMTCommands::from_args();
+    let subcommand_options = OMTCommands::parse();
 
     match subcommand_options {
         OMTCommands::InstallBuildRequirements {} => install_build_requirements(),
