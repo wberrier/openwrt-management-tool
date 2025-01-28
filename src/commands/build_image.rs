@@ -2,6 +2,7 @@ use anyhow::{bail, Result};
 use std::fs;
 use std::path::{Path, PathBuf};
 
+use super::super::commands::install_build_requirements::install_build_requirements;
 use super::super::config::{get_config, Config};
 use super::super::openwrt_vars::{archive_path, image_builder_url, sdk_dir};
 use shleazy::{getstatus, run_shell_or_err};
@@ -30,8 +31,12 @@ fn extract_image_builder(config: &Config) -> Result<()> {
     Ok(())
 }
 
-pub fn build_image(name: String) -> Result<()> {
+pub fn build_image(name: String, install_build_deps: bool) -> Result<()> {
     let config = get_config(&name)?;
+
+    if install_build_deps {
+        install_build_requirements()?;
+    }
 
     println!("Building image for: {}", &name);
     println!("Configuration: {:#?}", config);

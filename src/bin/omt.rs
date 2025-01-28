@@ -1,39 +1,62 @@
-use anyhow::Result;
-use clap::Parser;
+use anyhow::{bail, Result};
+use clap::{Parser, Subcommand};
 
 use openwrt_management_tool::commands::build_image::build_image;
 use openwrt_management_tool::commands::create_backup::create_backup;
-use openwrt_management_tool::commands::install_build_requirements::install_build_requirements;
 use openwrt_management_tool::commands::install_image::install_image;
 use openwrt_management_tool::commands::restore_backup::restore_backup;
 use openwrt_management_tool::commands::upgrade_packages::upgrade_packages;
 
 #[derive(Debug, Parser)]
 #[clap(about, author)]
-enum OMTCommands {
-    #[clap(about = "install build requirements")]
-    InstallBuildRequirements {},
-    #[clap(about = "build firmware image")]
-    BuildImage { name: String },
-    #[clap(about = "install firmware image")]
-    InstallImage { name: String },
-    #[clap(about = "create backup configuration")]
-    CreateBackup { name: String },
-    #[clap(about = "restore backup configuration")]
-    RestoreBackup { name: String },
-    #[clap(about = "upgrade packages")]
-    UpgradePackages { name: String },
+struct Args {
+    #[clap(short, long, required = true, value_delimiter = ',')]
+    names: Vec<String>,
+    #[command(subcommand)]
+    command: OMTCommand,
+}
+
+#[derive(Debug, Subcommand, Clone)]
+enum OMTCommand {
+    /// build firmware image
+    BuildImage {
+        #[clap(short = 'i')]
+        install_build_deps: bool,
+    },
+    /// install firmware image
+    InstallImage {},
+    /// create backup configuration
+    CreateBackup {},
+    /// restore backup configuration
+    RestoreBackup {},
+    /// upgrade packages
+    UpgradePackages {},
 }
 
 fn main() -> Result<()> {
-    let subcommand_options = OMTCommands::parse();
+    let args = Args::parse();
 
-    match subcommand_options {
-        OMTCommands::InstallBuildRequirements {} => install_build_requirements(),
-        OMTCommands::BuildImage { name } => build_image(name),
-        OMTCommands::InstallImage { name } => install_image(name),
-        OMTCommands::CreateBackup { name } => create_backup(name),
-        OMTCommands::RestoreBackup { name } => restore_backup(name),
-        OMTCommands::UpgradePackages { name } => upgrade_packages(name),
+    // Flag to ensure deps are only installed once
+    let mut first_build_image = true;
+
+    for name in args.names {
+        match match args.command {
+            OMTCommand::BuildImage { install_build_deps } => {
+                let result = build_image(name, first_build_image && install_build_deps);
+                first_build_image = false;
+                result
+            }
+            OMTCommand::InstallImage {} => install_image(name),
+            OMTCommand::CreateBackup {} => create_backup(name),
+            OMTCommand::RestoreBackup {} => restore_backup(name),
+            OMTCommand::UpgradePackages {} => upgrade_packages(name),
+        } {
+            Ok(()) => {}
+            Err(error) => {
+                bail!("Error running command: {:?}, {:?}", args.command, error);
+            }
+        }
     }
+
+    Ok(())
 }
