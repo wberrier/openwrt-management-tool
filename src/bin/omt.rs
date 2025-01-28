@@ -1,12 +1,14 @@
 use anyhow::{bail, Result};
 use clap::{Parser, Subcommand, ValueEnum};
 
-use openwrt_management_tool::commands::build_image::build_image;
-use openwrt_management_tool::commands::create_backup::create_backup;
-use openwrt_management_tool::commands::install_image::install_image;
-use openwrt_management_tool::commands::restore_backup::restore_backup;
-use openwrt_management_tool::commands::upgrade_packages::upgrade_packages;
-use openwrt_management_tool::commands::wifi::set_wifi;
+use openwrt_management_tool as omt;
+
+use omt::commands::build_image::build_image;
+use omt::commands::create_backup::create_backup;
+use omt::commands::install_image::install_image;
+use omt::commands::restore_backup::restore_backup;
+use omt::commands::upgrade_packages::upgrade_packages;
+use omt::commands::wifi::set_wifi;
 
 #[derive(Debug, Parser)]
 #[clap(about, author)]
