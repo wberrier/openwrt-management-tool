@@ -1,11 +1,12 @@
 use anyhow::{bail, Result};
-use clap::{Parser, Subcommand};
+use clap::{Parser, Subcommand, ValueEnum};
 
 use openwrt_management_tool::commands::build_image::build_image;
 use openwrt_management_tool::commands::create_backup::create_backup;
 use openwrt_management_tool::commands::install_image::install_image;
 use openwrt_management_tool::commands::restore_backup::restore_backup;
 use openwrt_management_tool::commands::upgrade_packages::upgrade_packages;
+use openwrt_management_tool::commands::wifi::set_wifi;
 
 #[derive(Debug, Parser)]
 #[clap(about, author)]
@@ -31,6 +32,17 @@ enum OMTCommand {
     RestoreBackup {},
     /// upgrade packages
     UpgradePackages {},
+    /// set wifi
+    SetWifi {
+        #[arg(require_equals = true, num_args = 0..=1, value_enum, value_name = "on|off")]
+        value: OnOff,
+    },
+}
+
+#[derive(ValueEnum, Copy, Clone, Debug, PartialEq, Eq)]
+enum OnOff {
+    On,
+    Off,
 }
 
 fn main() -> Result<()> {
@@ -50,6 +62,7 @@ fn main() -> Result<()> {
             OMTCommand::CreateBackup {} => create_backup(name),
             OMTCommand::RestoreBackup {} => restore_backup(name),
             OMTCommand::UpgradePackages {} => upgrade_packages(name),
+            OMTCommand::SetWifi { value } => set_wifi(name, value == OnOff::On),
         } {
             Ok(()) => {}
             Err(error) => {
