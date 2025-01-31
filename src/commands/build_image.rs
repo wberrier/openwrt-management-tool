@@ -31,7 +31,7 @@ fn extract_image_builder(config: &Config) -> Result<()> {
     Ok(())
 }
 
-pub fn build_image(name: String, install_build_deps: bool) -> Result<()> {
+pub fn build_image(name: String, install_build_deps: bool, skip_files: bool) -> Result<()> {
     let config = get_config(&name)?;
 
     if install_build_deps {
@@ -75,7 +75,7 @@ pub fn build_image(name: String, install_build_deps: bool) -> Result<()> {
         format!("DISABLED={}", disabled_services_str),
     ];
 
-    if !config.skip_files {
+    if !skip_files {
         make_args.push(format!("FILES={}", rootfs_dir));
     } else {
         println!("NOTE: skipping files");

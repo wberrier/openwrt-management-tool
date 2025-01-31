@@ -23,8 +23,12 @@ struct Args {
 enum OMTCommand {
     /// build firmware image
     BuildImage {
+        /// install host dependencies
         #[clap(short = 'i')]
         install_build_deps: bool,
+        /// skip rootfs file includes
+        #[clap(short = 's')]
+        skip_files: bool,
     },
     /// install firmware image
     InstallImage {},
@@ -55,8 +59,11 @@ fn main() -> Result<()> {
 
     for name in args.names {
         match match args.command {
-            OMTCommand::BuildImage { install_build_deps } => {
-                let result = build_image(name, first_build_image && install_build_deps);
+            OMTCommand::BuildImage {
+                install_build_deps,
+                skip_files,
+            } => {
+                let result = build_image(name, first_build_image && install_build_deps, skip_files);
                 first_build_image = false;
                 result
             }

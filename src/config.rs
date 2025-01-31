@@ -34,7 +34,6 @@ pub struct ImageConfig {
     pub packages: Option<Vec<String>>,
     pub package_removals: Option<Vec<String>>,
     pub disabled_services: Option<Vec<String>>,
-    pub skip_files: Option<bool>,
     // Optional include values
     pub includes: Option<BaseIncludes>,
 }
@@ -53,8 +52,6 @@ pub struct Config {
     pub sub_target: String,
     pub profile: String,
     pub extra_image_name: String,
-
-    pub skip_files: bool,
 }
 
 impl Config {
@@ -71,8 +68,6 @@ impl Config {
             sub_target: "".to_string(),
             profile: "".to_string(),
             extra_image_name: "".to_string(),
-
-            skip_files: false,
         }
     }
 }
@@ -120,10 +115,6 @@ pub fn get_config(name: &String) -> Result<Config> {
 
     if let Some(disabled_services) = image_config.disabled_services {
         config.disabled_services.extend(disabled_services);
-    }
-
-    if let Some(skip_files) = image_config.skip_files {
-        config.skip_files = skip_files;
     }
 
     if let Some(includes) = image_config.includes {
