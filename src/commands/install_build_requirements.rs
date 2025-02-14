@@ -5,7 +5,7 @@ use super::super::os_common::{install_packages, package_system, PackageSystem};
 pub fn install_build_requirements() -> Result<()> {
     match package_system() {
         Ok(PackageSystem::DNF) => {
-            install_packages("git gawk gettext ncurses-devel zlib-devel openssl-devel libxslt wget which @c-development @development-tools @development-libs zlib-static python3 python3-setuptools perl-FindBin")
+            install_packages("git gawk gettext ncurses-devel zlib-devel openssl-devel libxslt wget which @c-development @development-tools @development-libs zlib-static python3 python3-setuptools perl-FindBin perl-Time-Piece")
 
         },
         Ok(PackageSystem::APT) => {
