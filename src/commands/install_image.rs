@@ -27,7 +27,7 @@ pub fn install_image(name: String) -> Result<()> {
         // Copy file
         println!("Copying image: '{}'", &image_path_str);
         run_shell_or_err(format!(
-            "cat \"{}\" | ssh root@{} \"cat > /tmp/image.bin\"",
+            "scp -O \"{}\" root@{}:/tmp/image.bin",
             &image_path_str, &name
         ))?;
 
