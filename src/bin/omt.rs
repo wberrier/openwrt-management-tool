@@ -9,6 +9,7 @@ use omt::commands::install_image::install_image;
 use omt::commands::restore_backup::restore_backup;
 use omt::commands::upgrade_packages::upgrade_packages;
 use omt::commands::wifi::set_wifi;
+use omt::config::get_config;
 
 #[derive(Debug, Parser)]
 #[clap(about, author)]
@@ -58,20 +59,23 @@ fn main() -> Result<()> {
     let mut first_build_image = true;
 
     for name in args.names {
+        let config = get_config(&name)?;
+
         match match args.command {
             OMTCommand::BuildImage {
                 install_build_deps,
                 skip_files,
             } => {
-                let result = build_image(name, first_build_image && install_build_deps, skip_files);
+                let result =
+                    build_image(&config, first_build_image && install_build_deps, skip_files);
                 first_build_image = false;
                 result
             }
-            OMTCommand::InstallImage {} => install_image(name),
-            OMTCommand::CreateBackup {} => create_backup(name),
-            OMTCommand::RestoreBackup {} => restore_backup(name),
-            OMTCommand::UpgradePackages {} => upgrade_packages(name),
-            OMTCommand::SetWifi { value } => set_wifi(name, value == OnOff::On),
+            OMTCommand::InstallImage {} => install_image(&config),
+            OMTCommand::CreateBackup {} => create_backup(&config),
+            OMTCommand::RestoreBackup {} => restore_backup(&config),
+            OMTCommand::UpgradePackages {} => upgrade_packages(&config),
+            OMTCommand::SetWifi { value } => set_wifi(&config, value == OnOff::On),
         } {
             Ok(()) => {}
             Err(error) => {

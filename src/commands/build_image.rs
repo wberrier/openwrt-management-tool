@@ -3,7 +3,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use super::super::commands::install_build_requirements::install_build_requirements;
-use super::super::config::{get_config, Config};
+use super::super::config::Config;
 use super::super::openwrt_vars::{archive_path, image_builder_url, sdk_dir};
 use shleazy::{getstatus, run_shell_or_err};
 
@@ -31,21 +31,19 @@ fn extract_image_builder(config: &Config) -> Result<()> {
     Ok(())
 }
 
-pub fn build_image(name: String, install_build_deps: bool, skip_files: bool) -> Result<()> {
-    let config = get_config(&name)?;
-
+pub fn build_image(config: &Config, install_build_deps: bool, skip_files: bool) -> Result<()> {
     if install_build_deps {
         install_build_requirements()?;
     }
 
-    println!("Building image for: {}", &name);
+    println!("Building image for: {}", &config.name);
     println!("Configuration: {:#?}", config);
 
     let current_dir: PathBuf = std::env::current_dir()?;
     let mut temp_dir = current_dir.clone();
     temp_dir.push("tmp");
     let mut rootfs_dir_path = current_dir.clone();
-    rootfs_dir_path.push(name);
+    rootfs_dir_path.push(&config.name);
     let rootfs_dir = rootfs_dir_path.as_path().to_string_lossy();
 
     fs::create_dir_all(&temp_dir)?;
@@ -61,7 +59,7 @@ pub fn build_image(name: String, install_build_deps: bool, skip_files: bool) -> 
 
     // Construct arguments
     let mut packages_str = config.packages.join(" ");
-    for p in config.package_removals {
+    for p in &config.package_removals {
         packages_str.push_str(format!(" -{}", p).as_str());
     }
 

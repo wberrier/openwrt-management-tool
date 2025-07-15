@@ -34,6 +34,8 @@ pub struct ImageConfig {
     pub packages: Option<Vec<String>>,
     pub package_removals: Option<Vec<String>>,
     pub disabled_services: Option<Vec<String>>,
+    // Optional hostname to use for ssh operations if name doesn't resolve
+    pub hostname: Option<String>,
     // Optional include values
     pub includes: Option<BaseIncludes>,
 }
@@ -42,6 +44,7 @@ pub struct ImageConfig {
 /// Final merged config
 /// Not sure how to construct this in a simpler way...
 pub struct Config {
+    pub name: String,
     pub release: String,
     pub sysupgrade_extension: String,
     pub packages: Vec<String>,
@@ -52,12 +55,15 @@ pub struct Config {
     pub sub_target: String,
     pub profile: String,
     pub extra_image_name: String,
+
+    pub hostname: String,
 }
 
 impl Config {
     fn new() -> Self {
         // TODO: easier way to get some default values?
         Self {
+            name: "".to_string(),
             release: "".to_string(),
             sysupgrade_extension: "".to_string(),
             packages: vec![],
@@ -68,6 +74,8 @@ impl Config {
             sub_target: "".to_string(),
             profile: "".to_string(),
             extra_image_name: "".to_string(),
+
+            hostname: "".to_string(),
         }
     }
 }
@@ -89,6 +97,8 @@ pub fn get_config(name: &String) -> Result<Config> {
     let image_config: ImageConfig = serde_yaml::from_str(&yaml_image_config)?;
 
     let mut config = Config::new();
+
+    config.name = name.to_string();
 
     // TODO: better way to minimize duplication? proc macro?
 
@@ -146,6 +156,13 @@ pub fn get_config(name: &String) -> Result<Config> {
     config.sub_target = image_config.sub_target;
     config.profile = image_config.profile;
     config.extra_image_name = image_config.extra_image_name;
+
+    // Allow setting the hostname for various operations
+    if let Some(hostname) = image_config.hostname {
+        config.hostname = hostname;
+    } else {
+        config.hostname = name.to_string();
+    }
 
     Ok(config)
 }
