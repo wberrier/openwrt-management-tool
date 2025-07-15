@@ -11,8 +11,8 @@ pub fn install_image(config: &Config) -> Result<()> {
 
     let mut image_path: PathBuf = std::env::current_dir()?;
     image_path.push("tmp");
-    image_path.push(sdk_dir(&config)?);
-    image_path.push(image_file_path(&config)?);
+    image_path.push(sdk_dir(config)?);
+    image_path.push(image_file_path(config)?);
 
     if image_path.exists() {
         let image_path_str = image_path.to_string_lossy();

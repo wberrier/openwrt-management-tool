@@ -26,5 +26,5 @@ pub fn install_packages(packages: &str) -> Result<()> {
         Err(error) => bail!(error),
     };
 
-    run_shell_or_err(format!("{} {}", install_command, packages))
+    run_shell_or_err(format!("{install_command} {packages}"))
 }

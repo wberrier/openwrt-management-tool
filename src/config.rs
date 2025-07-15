@@ -82,7 +82,7 @@ impl Config {
 
 // Nicer error message
 fn open_file(filename: &String) -> Result<String> {
-    println!("Reading config file: {}", filename);
+    println!("Reading config file: {filename}");
     match std::fs::read_to_string(filename) {
         Ok(s) => Ok(s),
         Err(_) => Err(anyhow!("Unable to read file: {}", filename)),
@@ -90,10 +90,10 @@ fn open_file(filename: &String) -> Result<String> {
 }
 
 pub fn get_config(name: &String) -> Result<Config> {
-    let yaml_base_config = open_file(&format!("{}/{}", CONFIG_DIR, BASE_CONFIG_FILE_NAME))?;
+    let yaml_base_config = open_file(&format!("{CONFIG_DIR}/{BASE_CONFIG_FILE_NAME}"))?;
     let base_config: BaseConfig = serde_yaml::from_str(&yaml_base_config)?;
 
-    let yaml_image_config = open_file(&format!("{}/image-{}.yml", CONFIG_DIR, name))?;
+    let yaml_image_config = open_file(&format!("{CONFIG_DIR}/image-{name}.yml"))?;
     let image_config: ImageConfig = serde_yaml::from_str(&yaml_image_config)?;
 
     let mut config = Config::new();

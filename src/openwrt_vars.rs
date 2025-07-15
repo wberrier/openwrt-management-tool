@@ -28,7 +28,7 @@ pub fn image_builder_url(config: &Config) -> Result<String> {
         bail!("Missing target or sub_target");
     }
 
-    let sdk_extension = sdk_extension(&config)?;
+    let sdk_extension = sdk_extension(config)?;
 
     if config.release == "snapshot" {
         return Ok(format!("https://downloads.openwrt.org/snapshots/targets/{}/{}/openwrt-imagebuilder-{}-{}.Linux-x86_64{}", &config.target, &config.sub_target, &config.target, &config.sub_target, sdk_extension));
@@ -39,9 +39,9 @@ pub fn image_builder_url(config: &Config) -> Result<String> {
 
 // TODO: return Path instead of String?
 pub fn sdk_dir(config: &Config) -> Result<String> {
-    let archive_path = archive_path(&config)?;
+    let archive_path = archive_path(config)?;
 
-    let sdk_extension = sdk_extension(&config)?;
+    let sdk_extension = sdk_extension(config)?;
 
     let sdk_dir = archive_path
         .strip_suffix(sdk_extension.as_str())
@@ -51,7 +51,7 @@ pub fn sdk_dir(config: &Config) -> Result<String> {
 }
 
 pub fn archive_path(config: &Config) -> Result<String> {
-    let url = &image_builder_url(&config)?;
+    let url = &image_builder_url(config)?;
     let path = Path::new(url);
     Ok(path
         .file_name()
