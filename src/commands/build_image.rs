@@ -69,7 +69,7 @@ pub fn build_image(config: &Config, install_build_deps: bool, skip_files: bool) 
         format!("PROFILE={}", &config.profile),
         format!("PACKAGES={}", packages_str),
         format!("EXTRA_IMAGE_NAME={}", &config.extra_image_name),
-        format!("DISABLED={}", disabled_services_str),
+        format!("DISABLED_SERVICES={}", disabled_services_str),
     ];
 
     if !skip_files {
