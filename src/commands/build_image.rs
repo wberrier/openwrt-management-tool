@@ -78,7 +78,10 @@ pub fn build_image(config: &Config, install_build_deps: bool, skip_files: bool) 
         println!("NOTE: skipping files");
     }
 
-    println!("Building the image via calling 'make' with the following arguments: {:?}", make_args);
+    println!(
+        "Building the image via calling 'make' with the following arguments: {:?}",
+        make_args
+    );
     let code = getstatus("make", make_args)?;
 
     // Go back to original directory
