@@ -6,6 +6,14 @@ use anyhow::{anyhow, bail, Result};
 
 use super::config::Config;
 
+// Provide some mirrors (downloads.openwrt.org is a bit slow...)
+pub static IMAGE_BUILDER_DOWNLOAD_PREFIX: [&str; 4] = [
+    "https://openwrt.mirror.garr.it/openwrt",
+    "https://mirrors.cloud.tencent.com/openwrt",
+    "https://ftp.snt.utwente.nl/pub/software/lede",
+    "https://downloads.openwrt.org",
+];
+
 pub fn sdk_extension(config: &Config) -> Result<String> {
     let release_str = config.release.clone();
     let release = Version::from(release_str.as_str()).ok_or(anyhow!("invalid version"))?;
@@ -23,7 +31,7 @@ pub fn sdk_extension(config: &Config) -> Result<String> {
     Ok(extension)
 }
 
-pub fn image_builder_url(config: &Config) -> Result<String> {
+pub fn image_builder_url_path(config: &Config) -> Result<String> {
     if config.target.is_empty() || config.sub_target.is_empty() {
         bail!("Missing target or sub_target");
     }
@@ -31,10 +39,22 @@ pub fn image_builder_url(config: &Config) -> Result<String> {
     let sdk_extension = sdk_extension(config)?;
 
     if config.release == "snapshot" {
-        return Ok(format!("https://downloads.openwrt.org/snapshots/targets/{}/{}/openwrt-imagebuilder-{}-{}.Linux-x86_64{}", &config.target, &config.sub_target, &config.target, &config.sub_target, sdk_extension));
+        return Ok(format!(
+            "snapshots/targets/{}/{}/openwrt-imagebuilder-{}-{}.Linux-x86_64{}",
+            &config.target, &config.sub_target, &config.target, &config.sub_target, sdk_extension
+        ));
     }
 
-    Ok(format!("https://downloads.openwrt.org/releases/{}/targets/{}/{}/openwrt-imagebuilder-{}-{}-{}.Linux-x86_64{}", &config.release, &config.target, &config.sub_target, &config.release, &config.target, &config.sub_target, sdk_extension))
+    Ok(format!(
+        "releases/{}/targets/{}/{}/openwrt-imagebuilder-{}-{}-{}.Linux-x86_64{}",
+        &config.release,
+        &config.target,
+        &config.sub_target,
+        &config.release,
+        &config.target,
+        &config.sub_target,
+        sdk_extension
+    ))
 }
 
 // TODO: return Path instead of String?
@@ -51,7 +71,7 @@ pub fn sdk_dir(config: &Config) -> Result<String> {
 }
 
 pub fn archive_path(config: &Config) -> Result<String> {
-    let url = &image_builder_url(config)?;
+    let url = &image_builder_url_path(config)?;
     let path = Path::new(url);
     Ok(path
         .file_name()

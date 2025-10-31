@@ -1,20 +1,35 @@
-use anyhow::{bail, Result};
+use anyhow::{anyhow, bail, Result};
 use std::fs;
 use std::path::{Path, PathBuf};
 
 use super::super::commands::install_build_requirements::install_build_requirements;
 use super::super::config::Config;
-use super::super::openwrt_vars::{archive_path, image_builder_url, sdk_dir};
+use super::super::openwrt_vars::{
+    archive_path, image_builder_url_path, sdk_dir, IMAGE_BUILDER_DOWNLOAD_PREFIX,
+};
 use shleazy::{getstatus, run_shell_or_err};
 
 fn fetch_image_builder(config: &Config) -> Result<()> {
     // TODO: could use native rust, but it would need to decode, support partial downloads, etc...
-    let image_builder_url = image_builder_url(config)?;
-    println!("Fetching image builder: {image_builder_url}");
+    let url_path = image_builder_url_path(config)?;
 
-    run_shell_or_err(format!(
-        "wget --continue --timestamping {image_builder_url}"
-    ))
+    let mut result = Err(anyhow!("no mirrors"));
+
+    // Try some mirrors
+    for base in IMAGE_BUILDER_DOWNLOAD_PREFIX {
+        let image_builder_url = format!("{}/{}", &base, &url_path);
+        println!("Fetching image builder: {image_builder_url}");
+
+        result = run_shell_or_err(format!("wget --continue {image_builder_url}"));
+
+        if result.is_ok() {
+            break;
+        }
+    }
+
+    // TODO: may want to verify the download
+
+    result
 }
 
 fn extract_image_builder(config: &Config) -> Result<()> {
