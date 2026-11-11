@@ -32,7 +32,13 @@ enum OMTCommand {
         skip_files: bool,
     },
     /// install firmware image
-    InstallImage {},
+    /// Also provide some values in case you don't want to grab them from the config
+    InstallImage {
+        /// optional filename path
+        filename: Option<String>,
+        /// optional hostname
+        hostname: Option<String>,
+    },
     /// create backup configuration
     CreateBackup {},
     /// restore backup configuration
@@ -71,7 +77,13 @@ fn main() -> Result<()> {
                 first_build_image = false;
                 result
             }
-            OMTCommand::InstallImage {} => install_image(&config),
+            OMTCommand::InstallImage {
+                ref filename,
+                ref hostname,
+            } => {
+                let result = install_image(&config, filename, hostname);
+                result
+            }
             OMTCommand::CreateBackup {} => create_backup(&config),
             OMTCommand::RestoreBackup {} => restore_backup(&config),
             OMTCommand::UpgradePackages {} => upgrade_packages(&config),
